@@ -67,6 +67,12 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "In this mode openpilot will ignore lanelines and just drive how it thinks a human would.",
       "../assets/offroad/icon_road.png",
     },
+    {
+      "NoOffroadFix",
+      "Fix openpilot No Offroad*",
+      "Enforce openpilot to go offroad and turns off after shutting down the car. This feature fixes non-official devices running openpilot without comma power.\n*Only enable this feature if your comma device does not shut down after the car is turned off.",
+      "../assets/offroad/icon_shell.png",
+    },
 #ifdef ENABLE_MAPS
     {
       "NavSettingTime24h",
