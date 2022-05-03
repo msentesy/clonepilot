@@ -98,7 +98,7 @@ TinklaTogglesPanel::TinklaTogglesPanel(SettingsWindow *parent) : ListWidget(pare
       "# * 15 min:",
       "Enter # of 1/4h to shutdown device after:",
       "",
-      3.0,1.0,720.0,1.0,TINKLA_FLOAT
+      4.0,1.0,720.0,1.0,TINKLA_FLOAT
     },
     {"TinklaHandsOnLevel",
       "Hands on level",
