@@ -92,11 +92,11 @@ TinklaTogglesPanel::TinklaTogglesPanel(SettingsWindow *parent) : ListWidget(pare
       "","","",0.0,0.0,0.0,0.0, TINKLA_TOGGLE
       },
     {"TinklaShutdownAfter",
-      "Shutdown after time",
+      "Shutdown timer",
       "Shutdown device after a specified time when car is off",
       "../assets/offroad/icon_settings.png",
-      "# * 15 min:",
       "Enter # of 1/4h to shutdown device after:",
+      "# * 15 min:",
       "",
       4.0,1.0,720.0,1.0,TINKLA_FLOAT
     },
