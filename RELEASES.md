@@ -1,3 +1,23 @@
+Unity Version 0.8.13-47 (2022-05-11)
+========================
+ * Do not send iBooster brake command when real accelerator pedal is pressed
+
+Unity Version 0.8.13-46 (2022-05-10)
+========================
+ * Do not send iBooster brake command when accelerator pedal is pressed
+ * Increase brake hold value 
+
+Unity Version 0.8.13-45 (2022-05-09s)
+========================
+ * Update firmware for Vacuum Sensor board with brake release condition
+ * Allow 0x553 for iBooster in panda
+ * Allow 0x555 for IVS in panda
+ 
+ Unity Version 0.8.13-44 (2022-05-04)
+========================
+ * Update firmware for Vacuum Sensor board
+ * Fix CRC for iBooster
+
 Unity Version 0.8.13-43 (2022-04-21)
 ========================
  * Fix Pedal over CC issues when MCU2 or no Tinkla Buddy
