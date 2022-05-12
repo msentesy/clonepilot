@@ -1,5 +1,7 @@
 #include "selfdrive/ui/ui.h"
 
+#include <string>
+
 #include <cassert>
 #include <cmath>
 
@@ -71,6 +73,7 @@ static void update_line_data(const UIState *s, const cereal::ModelDataV2::XYZTDa
 }
 
 static void update_model(UIState *s, const cereal::ModelDataV2::Reader &model) {
+  SubMaster &sm = *(s->sm);
   UIScene &scene = s->scene;
   auto model_position = model.getPosition();
   float max_distance = std::clamp(model_position.getX()[TRAJECTORY_SIZE - 1],
@@ -92,6 +95,8 @@ static void update_model(UIState *s, const cereal::ModelDataV2::Reader &model) {
     scene.road_edge_stds[i] = road_edge_stds[i];
     update_line_data(s, road_edges[i], 0.025, 0, &scene.road_edge_vertices[i], max_idx);
   }
+  
+  scene.lateral_plan = sm["lateralPlan"].getLateralPlan();
 
   // update path
   auto lead_one = (*s->sm)["radarState"].getRadarState().getLeadOne();
@@ -111,6 +116,21 @@ static void update_state(UIState *s) {
   SubMaster &sm = *(s->sm);
   UIScene &scene = s->scene;
 
+// update engageability and DM icons at 2Hz
+  if (sm.frame % (UI_FREQ / 2) == 0) {
+    scene.engageable = sm["controlsState"].getControlsState().getEngageable();
+    scene.dm_active = sm["driverMonitoringState"].getDriverMonitoringState().getIsActiveMode();
+  }
+
+  if (scene.started && sm.updated("controlsState")) {
+    scene.controls_state = sm["controlsState"].getControlsState();
+  }
+  if (sm.updated("modelV2") && s->vg) {
+    auto model = sm["modelV2"].getModelV2();
+    update_model(s, model);
+    update_leads(s, model);
+  }
+  
   if (sm.updated("liveCalibration")) {
     auto rpy_list = sm["liveCalibration"].getLiveCalibration().getRpyCalib();
     Eigen::Vector3d rpy;
@@ -190,6 +210,16 @@ static void update_state(UIState *s) {
     scene.light_sensor = std::clamp<float>(1.0 - (ev / max_ev), 0.0, 1.0);
   }
   scene.started = sm["deviceState"].getDeviceState().getStarted() && scene.ignition;
+  if (sm.updated("lateralPlan")) {
+    scene.lateral_plan = sm["lateralPlan"].getLateralPlan();
+    auto data = sm["lateralPlan"].getLateralPlan();
+
+    scene.lateralPlan.laneWidth = data.getLaneWidth();
+    scene.lateralPlan.dProb = data.getDProb();
+    scene.lateralPlan.lProb = data.getLProb();
+    scene.lateralPlan.rProb = data.getRProb();
+    scene.lateralPlan.lanelessModeStatus = data.getLanelessMode();
+  }
 }
 
 void ui_update_params(UIState *s) {
@@ -221,6 +251,7 @@ void UIState::updateStatus() {
       status = STATUS_DISENGAGED;
       scene.started_frame = sm->frame;
       scene.end_to_end = Params().getBool("EndToEndToggle");
+      s->scene.laneless_mode = std::stoi(Params().get("LanelessMode"));
       wide_camera = Hardware::TICI() ? Params().getBool("EnableWideCamera") : false;
     } else {
       alert_active = false;
@@ -234,7 +265,7 @@ UIState::UIState(QObject *parent) : QObject(parent) {
   sm = std::make_unique<SubMaster, const std::initializer_list<const char *>>({
     "modelV2", "controlsState", "liveCalibration", "radarState", "deviceState", "roadCameraState",
     "pandaStates", "carParams", "driverMonitoringState", "sensorEvents", "carState", "liveLocationKalman",
-    "wideRoadCameraState",
+    "wideRoadCameraState", "lateralPlan",
   });
 
   Params params;
