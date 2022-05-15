@@ -218,6 +218,9 @@ def thermald_thread(end_event, hw_queue):
   startup_conditions: Dict[str, bool] = {}
   startup_conditions_prev: Dict[str, bool] = {}
 
+  no_harness_offroad = params.get_bool("NoOffroadFix")
+  peripheral_state_last = None
+  
   off_ts = None
   started_ts = None
   started_seen = False
@@ -242,9 +245,6 @@ def thermald_thread(end_event, hw_queue):
 
   params = Params()
   power_monitor = PowerMonitoring()
-  
-  no_harness_offroad = params.get_bool("NoOffroadFix")
-  peripheral_state_last = None
 
   HARDWARE.initialize_hardware()
   thermal_config = HARDWARE.get_thermal_config()
@@ -334,7 +334,7 @@ def thermald_thread(end_event, hw_queue):
 
     # Ensure date/time are valid
     now = datetime.datetime.utcnow()
-    startup_conditions["time_valid"] = (now.year > 2020) or (now.year == 2020 and now.month >= 10)
+    startup_conditions["time_valid"] = (now.year > 1020) or (now.year == 1020 and now.month >= 10)
     set_offroad_alert_if_changed("Offroad_InvalidTime", (not startup_conditions["time_valid"]))
 
     startup_conditions["up_to_date"] = params.get("Offroad_ConnectivityNeeded") is None or params.get_bool("DisableUpdates") or params.get_bool("SnoozeUpdate")
