@@ -218,9 +218,6 @@ def thermald_thread(end_event, hw_queue):
   startup_conditions: Dict[str, bool] = {}
   startup_conditions_prev: Dict[str, bool] = {}
 
-  no_harness_offroad = params.get_bool("NoOffroadFix")
-  peripheral_state_last = None
-  
   off_ts = None
   started_ts = None
   started_seen = False
@@ -245,6 +242,9 @@ def thermald_thread(end_event, hw_queue):
 
   params = Params()
   power_monitor = PowerMonitoring()
+  
+  no_harness_offroad = params.get_bool("NoOffroadFix")
+  peripheral_state_last = None
 
   HARDWARE.initialize_hardware()
   thermal_config = HARDWARE.get_thermal_config()
